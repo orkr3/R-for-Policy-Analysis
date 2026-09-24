@@ -1,0 +1,78 @@
+---
+title: "📊 [학부 실습] 제5주차: 언론에 나오는 예쁜 정책 그래프 그리기"
+author: "나혜선선"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## 🏫 강의 주제: ggplot2를 활용한 정책 데이터 시각화 기초
+정책 분석가에게 시각화(Visualization)는 단순한 그림 그리기가 아닙니다. 수많은 데이터 속에 숨겨진 정책적 시사점과 트렌드를 대중과 의사결정권자에게 직관적으로 전달하는 핵심 커뮤니케이션 도구입니다. 
+
+본 실습에서는 R의 대표적인 시각화 라이브러리인 `ggplot2`를 활용하여 국가의 경제 수준(1인당 GDP)과 국민 건강(기대수명)의 관계를 시각적으로 규명합니다.
+
+---
+
+### 1. 패키지 및 데이터 준비
+지난 주차에 학습한 `gapminder` 데이터셋을 다시 호출합니다.
+
+```{r load-data}
+library(gapminder)
+library(tidyverse)
+
+# 데이터 복사
+df <- gapminder
+```
+
+---
+
+### 2. ggplot2의 핵심 원리: 레이어(Layer) 쌓기
+`ggplot2`는 도화지를 깔고(`ggplot`), 점이나 선을 그리고(`geom_`), 축과 테마를 입히는(`theme`) 레이어 구조로 작동합니다. 
+
+#### (1) 가장 기본형 산점도 (Scatter Plot) 그려보기
+2007년 전 세계 국가들을 대상으로 **X축에는 1인당 GDP**, **Y축에는 기대수명**을 매핑하여 점을 찍어봅니다.
+
+```{r basic-scatter}
+df_2007 <- df %>% filter(year == 2007)
+
+ggplot(data = df_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point()
+```
+
+---
+
+### 3. 보고서·언론사 스타일로 그래프 업그레이드하기
+위의 기본 그래프는 축 이름이 영어 변수명으로 되어 있고 스타일이 투박합니다. 색상, 대륙별 구분, 추세선을 추가하여 '보고서 제출용'으로 정제해 보겠습니다.
+
+#### (2) 시각적 요소(색상, 크기) 및 추세선(Trendline) 추가
+- 대륙(`continent`)별로 점의 **색상**을 다르게 지정합니다.
+- 인구수(`pop`)에 따라 점의 **크기**를 다르게 하여 입체감을 줍니다.
+- 데이터의 전반적인 흐름을 보여주는 **우하향/우상향 추세선**을 추가합니다.
+
+```{r advanced-plot}
+ggplot(data = df_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent, size = pop), alpha = 0.7) + # alpha는 투명도
+  geom_smooth(method = "lm", color = "black", linetype = "dashed") + # 선형 추세선 추가
+  scale_size_area(max_size = 12) + # 인구수 비례 크기 최적화
+  labs(
+    title = "국가별 경제 수준과 기대수명의 관계 (2007년)",
+    subtitle = "1인당 GDP가 높은 국가일수록 국민의 기대수명이 증가하는 경향을 보입니다.",
+    x = "1인당 GDP (USD)",
+    y = "기대수명 (세)",
+    color = "대륙",
+    size = "총 인구수",
+    caption = "데이터 출처: Gapminder Project"
+  ) +
+  theme_minimal() # 깔끔한 흰색 바탕 테마 적용
+```
+
+---
+
+### 📝 실습 과제 안내 (Homework)
+본인의 깃허브 과제 제출 폴더에 다음 조건의 R 마크다운 코드를 작성해 업로드하세요.
+
+1. `df` 데이터셋 전체를 사용하여 **연도별(X축) 전 세계 평균 기대수명(Y축)의 변화**를 보여주는 **꺾은선 그래프(`geom_line`)**를 그리세요.
+2. 그래프 테마는 `theme_classic()`을 적용하고, 제목(`title`)에 **"연도별 전 세계 기대수명 증가 추세"**라는 한글 타이틀을 달아 완성하세요.

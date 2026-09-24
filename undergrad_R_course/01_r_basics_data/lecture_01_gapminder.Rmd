@@ -1,0 +1,88 @@
+---
+title: "📊 [학부 실습] 제3-4주차: R 기초 및 공공 데이터 정제"
+author: "나혜선" 
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## 🏫 강의 주제: 국가별 경제 수준(GDP)과 기대수명 데이터 탐색
+본 실습에서는 전 세계 경제학·정책학 학부 과정에서 데이터 시각화와 기초 통계를 가르칠 때 가장 사랑받는 **Gapminder 데이터셋**을 활용합니다. "국가가 부유해질수록 국민은 정말 더 오래 살까?"라는 정책학적인 질문을 던지며 R과 친해지는 시간을 가집니다.
+
+---
+
+### 1. 필수 패키지 로드
+실습 진행을 위해 데이터셋이 포함된 `gapminder` 패키지와 데이터 정제 전용 패키지인 `tidyverse`를 불러옵니다.
+
+```{r load-packages}
+library(gapminder)
+library(tidyverse)
+```
+
+---
+
+### 2. 데이터 불러오기 및 기본 탐색 (Data Exploration)
+내장된 gapminder 데이터를 불러와 구조와 변수별 기초 통계량을 확인합니다.
+
+```{r data-explore}
+df <- gapminder
+
+# 상위 6개 행 보기
+head(df)
+
+# 변수별 기초 통계량(평균, 중앙값 등) 확인
+summary(df)
+```
+
+**📊 변수 설명:**
+- `country`: 국가명
+- `continent`: 대륙
+- `year`: 조사 연도 (1952~2007)
+- `lifeExp`: 기대수명
+- `pop`: 총 인구
+- `gdpPercap`: 1인당 GDP
+
+---
+
+### 3. 정책학 연구자를 위한 핵심 데이터 정제 (`dplyr` 3대 함수)
+
+#### (1) `filter()` : 원하는 조건의 행(Row)만 골라내기
+가장 최신 연도인 2007년 데이터 중, 아시아 대륙만 필터링합니다.
+
+```{r filter-example}
+asia_2007 <- df %>% 
+  filter(year == 2007 & continent == "Asia")
+
+head(asia_2007)
+```
+
+#### (2) `select()` : 분석에 필요한 열(Column/변수)만 선택하기
+국가명, 연도, 1인당 GDP 변수만 쏙 뽑아내어 간결한 데이터셋을 만듭니다.
+
+```{r select-example}
+gdp_data <- df %>% 
+  select(country, year, gdpPercap)
+
+head(gdp_data)
+```
+
+#### (3) `mutate()` : 기존 변수를 활용해 새로운 변수(파생변수) 만들기
+정책 분석에서 자주 쓰이는 국가의 경제 규모를 파악하기 위해 `1인당 GDP`에 `총 인구`를 곱해 `국가 총 GDP(totalGdp)` 변수를 생성합니다.
+
+```{r mutate-example}
+df_total_gdp <- df %>% 
+  mutate(totalGdp = gdpPercap * pop)
+
+head(df_total_gdp)
+```
+
+---
+
+### 📝 실습 과제 안내 (Homework)
+본인의 깃허브 과제 제출 폴더에 다음 조건의 R 마크다운 코드를 작성해 업로드하세요.
+
+1. `gapminder` 데이터에서 **'Europe'(유럽)** 대륙의 데이터만 필터링하세요.
+2. 그중에서 기대수명(`lifeExp`)이 **80세 이상**인 국가와 연도만 `select` 하세요.

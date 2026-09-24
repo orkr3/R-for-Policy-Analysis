@@ -1,0 +1,85 @@
+---
+title: "📊 [학부 실습] 제11-12주차: 비슷한 사람끼리 짝짓기(Matching)와 자격 기준(RDD) 활용하기"
+author: "나혜선"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## 🏫 강의 주제: 성향점수매칭(PSM)과 회귀단절모형(RDD)의 직관적 이해
+지난 시간 배운 DID에 이어, 정책 평가에서 가장 자주 쓰이는 준실험 설계(Quasi-experiment) 기법 두 가지를 실습합니다. 복잡한 수식 대신 **"비슷한 조건의 사람끼리 비교하기(Matching)"**와 **"커트라인 전후의 사람 비교하기(RDD)"**의 직관을 R 코드로 배웁니다.
+
+---
+
+### 1. [11주차] 성향점수매칭 (Propensity Score Matching, PSM) 기초
+정책 수혜자와 비수혜자를 그냥 비교하면, 원래부터 똑똑하거나 원래부터 부유한 사람들이 정책을 받았을 확률(선택 편의)이 높습니다. 이를 막기 위해 **나이, 성별, 소득 등이 가장 비슷한 사람들끼리 1:1로 짝을 지어** 정책 효과를 비교하는 기법입니다.
+
+R의 표준 매칭 패키지인 `MatchIt`을 활용합니다.
+
+```{r psm-practice}
+# install.packages("MatchIt") # 필요한 학생은 주석 제거 후 설치
+library(MatchIt)
+library(tidyverse)
+
+# 실습용 가상 데이터 생성 (취업 지원 프로그램 효과 평가)
+set.seed(123)
+n_users <- 300
+sim_data <- tibble(
+  age = rnorm(n_users, mean = 28, sd = 4),
+  education = sample(12:16, n_users, replace = TRUE),
+  # 나이가 많고 교육 수준이 높을수록 프로그램에 참여(treatment)할 확률이 높다고 가정 (내생성 존재)
+  treatment = if_else(0.1*age + 0.3*education + rnorm(n_users) > 6, 1, 0),
+  # 취업 여부(Outcome)
+  employed = if_else(0.5*treatment + 0.05*age + rnorm(n_users) > 2, 1, 0)
+)
+
+# 1:1 성향점수 매칭 실행
+match_model <- matchit(treatment ~ age + education, data = sim_data, method = "nearest")
+
+# 매칭된 데이터셋만 따로 추출
+matched_data <- match.data(match_model)
+
+# 매칭 후 데이터로 아주 간단한 효과 확인 (치우침이 교정된 비교)
+table(matched_data$treatment, matched_data$employed)
+```
+
+---
+
+### 2. [12주차] 회귀단절모형 (Regression Discontinuity Design, RDD) 기초
+현실의 많은 정책은 **"시험 성적 70점 이상만 장학금 지급", "소득 하위 50%만 지원금 지급"** 처럼 명확한 **커트라인(Cut-off)**을 기준으로 수혜자가 결정됩니다. 
+
+이때 **69.9점을 맞아서 탈락한 사람과 70.1점을 맞아서 합격한 사람은 사실상 능력이 거의 똑같은 사람**으로 볼 수 있습니다. 이 커트라인 바로 주변의 사람들을 비교하여 정책의 효과를 정밀하게 발라내는 기법입니다.
+
+```{r rdd-practice}
+# install.packages("rdrobust") # 필요한 학생은 주석 제거 후 설치
+library(rdrobust)
+
+# 가상 데이터 생성 (시험 성적 70점 컷오프 기준 장학금 효과)
+set.seed(456)
+student_data <- tibble(
+  score = runif(200, min = 50, max = 90),          # 원래 시험 성적 (Running Variable)
+  grant = if_else(score >= 70, 1, 0)               # 70점 이상이면 장학금 수혜 (Treatment)
+) %>%
+  # 다음 학기 성적(Outcome) = 원래 실력 + 장학금 효과(5점) + 오차
+  mutate(next_gpa = 60 + 0.3 * score + 5 * grant + rnorm(200, mean = 0, sd = 2))
+
+# rdrobust 패키지를 활용한 컷오프(c=70)에서의 장학금 인과 효과 추정
+rdd_result <- rdrobust(y = student_data$next_gpa, x = student_data$score, c = 70)
+
+# 결과 요약 보기
+summary(rdd_result)
+```
+
+**🔍 결과 해석 가이드 (학생 안내용):**
+- 결과 창의 `Method` 아래 `RD_Estimate` 값을 확인하세요.
+- 데이터 설계 당시 부여했던 장학금의 순수한 효과인 **`5` 근처의 계수**가 도출될 것입니다. 70점 문턱에서 다음 학기 성적이 수직으로 5점 껑충 뛰어올랐음을 의미합니다.
+
+---
+
+### 📝 실습 과제 안내 (Homework)
+본인의 깃허브 과제 제출 폴더에 다음 조건의 코드를 작성해 업로드하세요.
+1. `student_data` 코드에서 장학금의 효과를 나타내는 부분인 `5 * grant`를 **`10 * grant`**(효과 10점 향상)로 수정하여 새로운 데이터를 생성하세요.
+2. 수정된 데이터로 `rdrobust` 함수를 다시 실행하고, 문턱(Cut-off)에서의 정책 효과 추정치(`RD_Estimate`)가 어떻게 바뀌었는지 확인하는 주석을 남기세요.

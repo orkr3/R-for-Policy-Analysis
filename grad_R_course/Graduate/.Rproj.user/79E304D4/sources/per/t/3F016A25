@@ -1,14 +1,14 @@
 {
-    "id": "60DA5A67",
+    "id": "3F016A25",
     "path": "C:/Users/skgtj/Desktop/R-for-Policy-Analysis/grad_R_course/Graduate/week01/week01.Rmd",
     "project_path": "week01/week01.Rmd",
     "type": "r_markdown",
     "hash": "376719566",
     "contents": "",
-    "dirty": true,
-    "created": 1790934395075.0,
+    "dirty": false,
+    "created": 1790935069296.0,
     "source_on_save": false,
-    "relative_order": 2,
+    "relative_order": 1,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
@@ -20,7 +20,7 @@
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1790934757735,
+    "last_content_update": 1790934420,
     "read_only": false,
     "read_only_alternatives": []
 }

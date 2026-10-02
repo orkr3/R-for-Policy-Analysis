@@ -24,5 +24,4 @@
 ---
 
 ## 💻 권장 개발 환경
-- **R / RStudio**: Open-source (무료 버전으로 학부 민원 최소화)
-- **Stata**: 버전 16 이상 권장 (대학원 논문 지도용)
+- **R / RStudio**: Open-source 

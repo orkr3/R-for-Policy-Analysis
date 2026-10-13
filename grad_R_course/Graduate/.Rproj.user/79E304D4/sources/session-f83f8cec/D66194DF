@@ -3,7 +3,7 @@
     "path": "C:/Users/skgtj/Desktop/R-for-Policy-Analysis/grad_R_course/Graduate/week12/week12.Rmd",
     "project_path": "week12/week12.Rmd",
     "type": "r_markdown",
-    "hash": "2865243248",
+    "hash": "2639499729",
     "contents": "",
     "dirty": false,
     "created": 1791884474097.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "499,2",
-        "scrollLine": "494"
+        "cursorPosition": "954,0",
+        "scrollLine": "944"
     },
     "folds": "",
-    "lastKnownWriteTime": 1791885946,
+    "lastKnownWriteTime": 1791886410,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1791886021447,
+    "last_content_update": 1791886410475,
     "read_only": false,
     "read_only_alternatives": []
 }

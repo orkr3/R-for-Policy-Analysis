@@ -1,6 +1,0 @@
-"0",""
-"0","lines("
-"0","  x_right,"
-"0","  predict(right_fit, newdata = data.frame(score = x_right)),"
-"0","  lwd = 2"
-"0",")"

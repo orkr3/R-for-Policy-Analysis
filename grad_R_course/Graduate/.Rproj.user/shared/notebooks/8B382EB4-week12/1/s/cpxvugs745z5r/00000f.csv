@@ -1,0 +1,8 @@
+"0","rdplot("
+"0","  y = rd_data$outcome,"
+"0","  x = rd_data$score,"
+"0","  c = 60,"
+"0","  title = ""Regression Discontinuity Plot"","
+"0","  x.label = ""Scholarship Score"","
+"0","  y.label = ""Academic Outcome"""
+"0",")"
